@@ -1,11 +1,8 @@
 'use strict';
 
-var listOfItem = [];
-var listOfDisplayed = [];
-var set = [];
-var arrayLocation = 0;
 var section = document.getElementById('images');
-var imagesToBeLoaded = [
+var listOfItems = [];
+var listOfImages = [
   'assets/img/bag.jpg',
   'assets/img/banana.jpg',
   'assets/img/bathroom.jpg',
@@ -27,99 +24,173 @@ var imagesToBeLoaded = [
   'assets/img/water-can.jpg',
   'assets/img/wine-glass.jpg'
 ];
+var thisSet = {};
+var previousSet = {};
+var labels = [];
+var data = [];
+var backgroundColor = [];
+var borderColor = [];
+var counter = 0;
 
-console.log(imagesToBeLoaded);
-
-// Object Constructor for the items
-function Item (name, src) {
+function Items(name, src) {
   this.name = name;
   this.src = src;
-  this.numberOfTimesClicked = 0;
-  this.numberOfTimesDisplayed = 0;
-  listOfItem.push(this);
+  this.numberOfClicks = 0;
+  this.numberOfViews = 0;
+  this.percent = 0;
+  listOfItems.push(this);
 }
 
-// Creates instances by going through the listofItems array
-function loadItems() {
-  for (var i = 0; i < imagesToBeLoaded.length; i++) {
-    new Item (`Image-${i}`, imagesToBeLoaded[i]);
-  }
-}
-loadItems();
-
-// Generates a random index value
-function randomNumberGenerator() {
-  return Math.floor(Math.random() * listOfItem.length);
-}
-
-// Generates a set of 3 unique numbers in the set array
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
-function generateSet() {
-  for (var i = 0; i < 3; i++) {
-    var random = randomNumberGenerator();
-    if (set.includes(random)) {
-      set = randomNumberGenerator();
-    }
-    else {
-      set.push(random);
-    }
-  }
-}
-
-// Tests to see if there are any duplicate numbers vs. the last set of 3 and transfer the set to listOfDisplayed array
-function updateListOfDisplayed() {
-  generateSet();
-  var test = false;
-  for (var i = listOfDisplayed.length - 3; i < listOfDisplayed.length; i++) {
-    for (var j = 0; j < 3; j++) {
-      if (listOfDisplayed[i] === set[j]) {
-        set = [];
-        break;
-      }
-      test = true;
-    }
-  }
-  if (test) {
-    listOfDisplayed = listOfDisplayed.concat(set);
-    arrayLocation = arrayLocation + 3;
-    set = [];
-  }
-}
-
-// Renders a new set of 3 items at a time by
-function showImages() {
-  updateListOfDisplayed();
-  for (var i = arrayLocation - 3; i < arrayLocation; i++) {
-    var figure = document.createElement('figure');
-    var img = document.createElement('img');
-    var figcaption = document.createElement('figcaption');
-    section.appendChild(figure);
-    figure.appendChild(img);
-    figure.appendChild(figcaption);
-    img.innerHTML = '';
-    figcaption.innerHTML = '';
-    img.src = listOfItem[listOfDisplayed[i]].src;
-    figcaption.textContent = listOfItem[listOfDisplayed[i]].name;
-  }
-  console.log(listOfDisplayed);
-  console.log(arrayLocation);
-}
-
-// Keep getting random Uncaught TypeError message
-// Need a function to remove the previous item set when clicked
-// Need a click counter (https://codepen.io/juliogcampos/pen/BzdjwY)
-// Need to track numberOfTimesClicked
-// Need to track numberOfTimesDisplayed
-// Need to stop event lisstner when total number of clicks = 25
-
-
-// https://gomakethings.com/removing-an-event-listener-with-vanilla-javascript/
-var clickHandler = function() {
-  document.getElementById('images').addEventListener('click', showImages);
+// Forked from the code reivew
+Items.prototype.updateViews = function () {
+  this.numberOfViews++;
 };
 
-listOfDisplayed;
-showImages();
-clickHandler();
-console.log(listOfDisplayed);
-console.log(arrayLocation);
+// Forked from the code reivew
+Items.prototype.updateClicks = function () {
+  this.numberOfClicks++;
+};
+
+Items.prototype.updatePercent = function () {
+  this.percent = Math.floor(this.numberOfClicks / this.numberOfViews * 100);
+};
+
+// Self invoking function to run the Item object constructor
+(function loadImages() {
+  for (var i = 0; i < listOfImages.length; i++) {
+    new Items (`Image-${i}`, listOfImages[i]);
+  }
+} )();
+
+// Forked from the code review
+// Creates img elemets with id and src based on numImages variable
+function setUpImagesSection(numImages) {
+  for (var i = 1; i <= numImages; i++) {
+    var img = document.createElement('img');
+    img.id = `image-${i}`;
+    img.src = '';
+    section.appendChild(img);
+  }
+}
+
+// Forked from the code review
+// Generates 3 unique random number set based on the number of instances
+// Checks if the generated number set does not match the previous number set
+// Updates number of times each items was dsiplayed
+function getRandomUniqueImage() {
+  var found = false;
+  while (!found) {
+    var random = Math.floor(Math.random() * listOfItems.length);
+    if (!thisSet[random] && !previousSet[random]) {
+      found = listOfItems[random];
+      listOfItems[random].updateViews();
+      thisSet[random] = true;
+    }
+  }
+  return found;
+}
+
+// Forked from the code reivew
+// Prints number of images specified by numImages
+// transfers thisSet object to previousSet object so it can be used to check for any repetitive numbers
+function showRandomImages(numImages) {
+  thisSet = {};
+  for (var i = 1; i <= numImages; i++) {
+    var id = `image-${i}`;
+    var img = document.getElementById(id);
+    var imageObject = getRandomUniqueImage();
+    img.src = imageObject.src;
+    img.alt = imageObject.name;
+  }
+  previousSet = thisSet;
+  counter++;
+}
+
+// Forked from the code reivew
+// Adds click event listener to the section of HTML where it holds all images
+function setupListener() {
+  section.addEventListener('click', clickHandler);
+}
+
+// Forked from the code reivew
+// Uses event bubbling to capture which image is clicked by targeting alt
+// Updates how many times an item was clicked
+// After 25 rounds of selection, removes the event listner and initiates priting results
+function clickHandler(e) {
+  var imageName = e.target.alt;
+  for (var i = 0; i < listOfItems.length; i++) {
+    if (listOfItems[i].name === imageName) {
+      listOfItems[i].updateClicks();
+    }
+  }
+  console.log(counter);
+  if (counter <= 25) {
+    showRandomImages(3);
+  }
+  else {
+    section.removeEventListener('click', clickHandler);
+    printRaw();
+    preparePercentage();
+    printPercent();
+  }
+}
+
+// Prints raw data of how many times each items was clicked on the Reuslt panel
+function printRaw() {
+  var result = document.getElementById('raw-result');
+  var ul = document.createElement('ul');
+  result.appendChild(ul);
+  for (var i = 0; i < listOfItems.length; i++) {
+    var li = document.createElement('li');
+    li.textContent = listOfItems[i].name + ': ' + listOfItems[i].numberOfClicks + ' votes';
+    ul.appendChild(li);
+  }
+}
+
+// Invokes updatePercent prototype to update each Item instances
+// Prepares arrays needed to print a chart for the percentage of times that an item was clicked when it was shown
+function preparePercentage() {
+  for (var i = 0; i < listOfItems.length; i++) {
+    listOfItems[i].updatePercent();
+    labels.push(listOfItems[i].name);
+    data.push(listOfItems[i].percent);
+    var r = Math.floor(Math.random() * 255);  // source: https://jsfiddle.net/5kLbasqp/26/
+    var g = Math.floor(Math.random() * 255);
+    var b = Math.floor(Math.random() * 255);
+    var a = 1;
+    backgroundColor.push('rgb(' + r + ',' + g + ',' + b + ',' + a * 0.2 + ')');
+    borderColor.push('rgb(' + r + ',' + g + ',' + b + ',' + a + ')');
+  }
+}
+
+// Prints a horizontal bar chart of the percetnage of times that an item was clicked when it was shown
+// Uses labels, data, backgroundColor, borderColor array generated from the preparePercentage function
+function printPercent() {
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'horizontalBar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'The percentage of times that an item was clicked when it was shown',
+        data: data,
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+}
+
+setUpImagesSection(3);
+showRandomImages(3);
+setupListener();
