@@ -3,13 +3,15 @@
     <head>
         <title>Bus Mall</title>
         <link rel="stylesheet" href="reset.css" />
+        <link rel="stylesheet" type="text/css" href="Chart.css">
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <header>
-            <h1>
-                Title
-            </h1>
+            <div>
+                <img src="https://via.placeholder.com/200x90" alt="Logo">
+                <h1>Bus Mall</h1>
+            </div>
             <nav>
                 <ul>
                     <li>Home</li>
@@ -20,21 +22,18 @@
             </nav>
         </header>
         <main>
-            <section>
-                <h2>
-                    Results
-                </h2>
+            <section id="raw-result">
+                <h2>Results</h2>
             </section>
             <section id="images">
             </section>
             <section>
-                <p>
-                    Lorem
-                </p>
+                <canvas id="myChart" width="693px" height="400px"></canvas>
             </section>
         </main>
         <footer>
         </footer>
+        <script src="app/Chart.js"></script>
         <script src="app/app.js"></script>
     </body>
 </html>
