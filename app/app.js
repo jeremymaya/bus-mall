@@ -62,6 +62,25 @@ Items.prototype.updatePercent = function () {
   }
 } )();
 
+// Check to see if there's database to track clicks and views count
+// Creates database if there is none 
+(function initiateLocalStorage() {
+  var clicks = [];
+  if (!localStorage.getItem('clicks')) {
+    for (var i = 0; i < listOfItems.length; i++) {
+      clicks.push(listOfItems[i].numberOfClicks);
+    }
+    localStorage.setItem('clicks', JSON.stringify(clicks));
+  }
+  var views = [];
+  if (!localStorage.getItem('views')) {
+    for (var j = 0; j < listOfItems.length; j++) {
+      views.push(listOfItems[j].numberOfViews);
+    }
+    localStorage.setItem('views', JSON.stringify(views));
+  }
+}) ();
+
 // Forked from the code review
 // Creates img elemets with id and src based on numImages variable
 function setUpImagesSection(numImages) {
@@ -77,6 +96,7 @@ function setUpImagesSection(numImages) {
 // Generates 3 unique random number set based on the number of instances
 // Checks if the generated number set does not match the previous number set
 // Updates number of times each items was dsiplayed
+// Gets local storage database and stores views count
 function getRandomUniqueImage() {
   var found = false;
   while (!found) {
@@ -84,6 +104,9 @@ function getRandomUniqueImage() {
     if (!thisSet[random] && !previousSet[random]) {
       found = listOfItems[random];
       listOfItems[random].updateViews();
+      var storedViews = JSON.parse(localStorage.getItem('views'));
+      storedViews[random]++;
+      localStorage.setItem('views', JSON.stringify(storedViews));
       thisSet[random] = true;
     }
   }
@@ -115,12 +138,16 @@ function setupListener() {
 // Forked from the code reivew
 // Uses event bubbling to capture which image is clicked by targeting alt
 // Updates how many times an item was clicked
+// Gets local storage database and stores clicks count
 // After 25 rounds of selection, removes the event listner and initiates priting results
 function clickHandler(e) {
   var imageName = e.target.alt;
   for (var i = 0; i < listOfItems.length; i++) {
     if (listOfItems[i].name === imageName) {
       listOfItems[i].updateClicks();
+      var storedClicks = JSON.parse(localStorage.getItem('clicks'));
+      storedClicks[i]++;
+      localStorage.setItem('clicks', JSON.stringify(storedClicks));
     }
   }
   console.log(counter);
