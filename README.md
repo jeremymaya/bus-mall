@@ -1,4 +1,9 @@
 # bus-mall
+
+## LAB-15b
+### Purpose of this lab is to showcase:
+* Understanding of Code Fellows' Code 201 learning materials in general
+
 ## LAB-13
 ### Purpose of this lab is to showcase:
 * Understanding of HTML 5 Storage
@@ -7,7 +12,7 @@
 ## LAB-12
 ### Purpose of this lab is to showcase:
 * Understanding of usage of Chart.js
-* Add a chart to from the LAB-11
+* Add a chart to from the the LAB-11
 
 ## LAB-11
 ### Purpose of this lab is to showcase: 
