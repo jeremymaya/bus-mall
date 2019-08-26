@@ -2,8 +2,8 @@
 <html>
     <head>
         <title>Bus Mall</title>
-        <link rel="stylesheet" href="css/reset.css" />
-        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="../css/reset.css" />
+        <link rel="stylesheet" href="../css/style.css" />
     </head>
     <body>
         <header>
@@ -13,20 +13,27 @@
             </div>
             <nav>
                 <ul>
-                        <li class="active"><a href="index.html"></a>Home</a></li>
-                        <li><a href="pages/products.html">Products</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                    <li class="active"><a href="products.html">Products</a></li>
                     <li>About</li>
                     <li>Contact</li>
                 </ul>
             </nav>
         </header>
         <main>
-          <h2>Welcome to Bus Mall! Please Click Product Tab to See the Products!</h2>
+            <section id="raw-result">
+                <h2>Current Results</h2>
+            </section>
+            <figure id="images">
+            </figure>
+            <section>
+                <canvas id="myChart" width="717px" height="400px"></canvas>
+            </section>
         </main>
         <footer>
             <p>&copy 2019 Kyungrae Kim for Code 201 Bus Mall Project</p>
         </footer>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-        <script src="app/app.js"></script>
+        <script src="../app/app.js"></script>
     </body>
 </html>

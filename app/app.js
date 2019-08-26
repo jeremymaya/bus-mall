@@ -3,26 +3,26 @@
 var section = document.getElementById('images');
 var listOfItems = [];
 var listOfImages = [
-  'assets/img/bag.jpg',
-  'assets/img/banana.jpg',
-  'assets/img/bathroom.jpg',
-  'assets/img/boots.jpg',
-  'assets/img/breakfast.jpg',
-  'assets/img/bubblegum.jpg',
-  'assets/img/chair.jpg',
-  'assets/img/cthulhu.jpg',
-  'assets/img/dog-duck.jpg',
-  'assets/img/dragon.jpg',
-  'assets/img/pen.jpg',
-  'assets/img/pet-sweep.jpg',
-  'assets/img/scissors.jpg',
-  'assets/img/shark.jpg',
-  'assets/img/sweep.png',
-  'assets/img/tauntaun.jpg',
-  'assets/img/unicorn.jpg',
-  'assets/img/usb.gif',
-  'assets/img/water-can.jpg',
-  'assets/img/wine-glass.jpg'
+  ['Bag', '../assets/img/bag.jpg'],
+  ['Banana', '../assets/img/banana.jpg'],
+  ['Bathroom', '../assets/img/bathroom.jpg'],
+  ['Boots', '../assets/img/boots.jpg'],
+  ['Breakfast', '../assets/img/breakfast.jpg'],
+  ['Bubblegum', '../assets/img/bubblegum.jpg'],
+  ['Chair', '../assets/img/chair.jpg'],
+  ['Cthulhu', '../assets/img/cthulhu.jpg'],
+  ['Dog-Duck', '../assets/img/dog-duck.jpg'],
+  ['Dragon', '../assets/img/dragon.jpg'],
+  ['Pen', '../assets/img/pen.jpg'],
+  ['Pet Seeep', '../assets/img/pet-sweep.jpg'],
+  ['Scissors', '../assets/img/scissors.jpg'],
+  ['Shark', '../assets/img/shark.jpg'],
+  ['Sweep', '../assets/img/sweep.png'],
+  ['Tauntaun', '../assets/img/tauntaun.jpg'],
+  ['Unicorn', '../assets/img/unicorn.jpg'],
+  ['USB', '../assets/img/usb.gif'],
+  ['Water Can', '../assets/img/water-can.jpg'],
+  ['Wine Glass', '../assets/img/wine-glass.jpg']
 ];
 var thisSet = {};
 var previousSet = {};
@@ -37,7 +37,6 @@ function Items(name, src) {
   this.src = src;
   this.numberOfClicks = 0;
   this.numberOfViews = 0;
-  this.percent = 0;
   listOfItems.push(this);
 }
 
@@ -51,19 +50,17 @@ Items.prototype.updateClicks = function () {
   this.numberOfClicks++;
 };
 
-Items.prototype.updatePercent = function () {
-  this.percent = Math.floor(this.numberOfClicks / this.numberOfViews * 100);
-};
-
 // Self invoking function to run the Item object constructor
 (function loadImages() {
   for (var i = 0; i < listOfImages.length; i++) {
-    new Items (`Image-${i}`, listOfImages[i]);
+    for (var j = 0; j < 1; j++) {
+      new Items (listOfImages[i][j], listOfImages[i][j + 1]);
+    }
   }
 } )();
 
 // Check to see if there's database to track clicks and views count
-// Creates database if there is none 
+// Creates database if there is none
 (function initiateLocalStorage() {
   var clicks = [];
   if (!localStorage.getItem('clicks')) {
@@ -151,7 +148,7 @@ function clickHandler(e) {
     }
   }
   console.log(counter);
-  if (counter <= 25) {
+  if (counter < 25) {
     showRandomImages(3);
   }
   else {
@@ -177,10 +174,12 @@ function printRaw() {
 // Invokes updatePercent prototype to update each Item instances
 // Prepares arrays needed to print a chart for the percentage of times that an item was clicked when it was shown
 function preparePercentage() {
+  var storedViews = JSON.parse(localStorage.getItem('views'));
+  var storedClicks = JSON.parse(localStorage.getItem('clicks'));
   for (var i = 0; i < listOfItems.length; i++) {
-    listOfItems[i].updatePercent();
+    var percent = Math.floor(storedClicks[i] / storedViews[i] * 100);
     labels.push(listOfItems[i].name);
-    data.push(listOfItems[i].percent);
+    data.push(percent);
     var r = Math.floor(Math.random() * 255);  // source: https://jsfiddle.net/5kLbasqp/26/
     var g = Math.floor(Math.random() * 255);
     var b = Math.floor(Math.random() * 255);
@@ -188,6 +187,8 @@ function preparePercentage() {
     backgroundColor.push('rgb(' + r + ',' + g + ',' + b + ',' + a * 0.2 + ')');
     borderColor.push('rgb(' + r + ',' + g + ',' + b + ',' + a + ')');
   }
+  localStorage.setItem('views', JSON.stringify(storedViews));
+  localStorage.setItem('clicks', JSON.stringify(storedClicks));
 }
 
 // Prints a horizontal bar chart of the percetnage of times that an item was clicked when it was shown
@@ -199,7 +200,7 @@ function printPercent() {
     data: {
       labels: labels,
       datasets: [{
-        label: 'The percentage of times that an item was clicked when it was shown',
+        label: 'The accumulated percentage of times that an item was clicked when it was shown',
         data: data,
         backgroundColor: backgroundColor,
         borderColor: borderColor,
